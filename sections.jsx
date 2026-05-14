@@ -110,6 +110,53 @@ function Wordmark({ size = 22 }) {
 
 }
 
+// ─── Nav cart badge ───────────────────────────────────────────────────────────
+function NavCartButton() {
+  const cart = React.useContext(window.CartContext);
+  const count = cart ? cart.count : 0;
+  const setOpen = cart ? cart.setOpen : () => {};
+  const [hov, setHov] = React.useState(false);
+  return (
+    <button
+      type="button"
+      onClick={() => setOpen(true)}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      aria-label={count > 0 ? `Panier — ${count} pièce${count > 1 ? 's' : ''}` : 'Panier'}
+      className="nav-cart-btn"
+      style={{
+        position: 'relative',
+        width: 36, height: 36, borderRadius: 999,
+        background: 'transparent',
+        border: `1px solid ${hov ? 'var(--ink-soft)' : 'var(--line)'}`,
+        color: hov ? 'var(--ink)' : 'var(--ink-soft)',
+        cursor: 'pointer',
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+        transition: 'color .25s ease, border-color .25s ease',
+      }}
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <path d="M16 10a4 4 0 0 1-8 0"/>
+      </svg>
+      {count > 0 && (
+        <span style={{
+          position: 'absolute', top: -5, right: -5,
+          width: 17, height: 17, borderRadius: 999,
+          background: 'var(--accent)', color: 'var(--paper)',
+          fontSize: 9, fontWeight: 700, fontFamily: 'var(--sans)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          letterSpacing: 0, lineHeight: 1,
+          border: '2px solid var(--bg)',
+        }}>
+          {count > 9 ? '9+' : count}
+        </span>
+      )}
+    </button>
+  );
+}
+
 // ─── Nav ─────────────────────────────────────────────────────────────────────
 function Nav() {
   const [scrolled, setScrolled] = React.useState(false);
@@ -155,6 +202,7 @@ function Nav() {
         </nav>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <ThemeToggle size={36} />
+          <NavCartButton />
           <a href="#reserver" className="nav-cta" style={{
             display: 'inline-flex', alignItems: 'center', gap: 8,
             padding: '10px 18px', borderRadius: 999,
@@ -636,8 +684,39 @@ function Manifesto() {
 
 }
 
+// ─── Signature add-to-cart button ────────────────────────────────────────────
+function SigAddButton({ item, cart }) {
+  const [hov, setHov] = React.useState(false);
+  return (
+    <button
+      type="button"
+      className="sig-add-btn"
+      onClick={() => cart && cart.add({ name: item.name, price: item.price, photo: item.photo })}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        marginTop: 18, display: 'inline-flex', alignItems: 'center', gap: 8,
+        background: 'transparent',
+        border: `1px solid ${hov ? 'var(--ink-soft)' : 'var(--line)'}`,
+        borderRadius: 999, padding: '8px 16px',
+        fontFamily: 'var(--sans)', fontSize: 11, fontWeight: 500,
+        letterSpacing: '0.16em', textTransform: 'uppercase',
+        color: hov ? 'var(--ink)' : 'var(--ink-mute)',
+        cursor: 'pointer',
+        transition: 'color .2s ease, border-color .2s ease',
+      }}
+    >
+      <svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+        <path d="M6 1v10M1 6h10"/>
+      </svg>
+      Ajouter
+    </button>
+  );
+}
+
 // ─── Signature pastries ──────────────────────────────────────────────────────
 function Signatures() {
+  const cart = React.useContext(window.CartContext);
   const items = [
   {
     n: '01',
@@ -701,6 +780,7 @@ function Signatures() {
               <p style={{ fontSize: 13.5, lineHeight: 1.7, color: 'var(--ink-soft)', margin: 0, maxWidth: 360 }}>
                 {it.desc}
               </p>
+              <SigAddButton item={it} cart={cart} />
             </article>
           )}
         </div>
@@ -1099,5 +1179,5 @@ function Footer() {
 // Export for app.jsx
 Object.assign(window, {
   useReveal, Nav, Hero, Marquee, Manifesto, Signatures, Atelier, Gallery, Press, Visit, Footer, Wordmark,
-  ThemeToggle, useTheme
+  ThemeToggle, useTheme, NavCartButton, SigAddButton,
 });

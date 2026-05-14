@@ -19,6 +19,240 @@ const FPHOTO = {
   menu6: "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?w=600&q=80&auto=format&fit=crop",
 };
 
+// ─── Cart helpers ─────────────────────────────────────────────────────────────
+const fmtPrice = (n) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+const parsePrice = (s) => parseInt(String(s).replace(/[\s  ]/g,'').replace('CFA',''), 10) || 0;
+
+const CartContext = React.createContext({
+  items:[], open:false, setOpen:()=>{}, add:()=>{}, remove:()=>{}, updateQty:()=>{}, total:0, count:0,
+});
+window.CartContext = CartContext;
+
+function useCart() { return React.useContext(CartContext); }
+window.useCart = useCart;
+
+function CartProvider({ children }) {
+  const [items, setItems] = React.useState([]);
+  const [open, setOpen] = React.useState(false);
+
+  const add = React.useCallback((dish) => {
+    setItems(prev => {
+      const idx = prev.findIndex(it => it.name === dish.name);
+      if (idx >= 0) return prev.map((it, i) => i === idx ? { ...it, qty: it.qty + 1 } : it);
+      return [...prev, { name: dish.name, price: dish.price, priceNum: parsePrice(dish.price), photo: dish.photo, qty: 1 }];
+    });
+    setOpen(true);
+  }, []);
+
+  const remove = React.useCallback((name) => setItems(prev => prev.filter(it => it.name !== name)), []);
+
+  const updateQty = React.useCallback((name, delta) => {
+    setItems(prev => prev.map(it => {
+      if (it.name !== name) return it;
+      const qty = it.qty + delta;
+      return qty <= 0 ? null : { ...it, qty };
+    }).filter(Boolean));
+  }, []);
+
+  const total = items.reduce((acc, it) => acc + it.priceNum * it.qty, 0);
+  const count = items.reduce((acc, it) => acc + it.qty, 0);
+
+  return (
+    <CartContext.Provider value={{ items, open, setOpen, add, remove, updateQty, total, count }}>
+      {children}
+      <CartDrawer />
+    </CartContext.Provider>
+  );
+}
+window.CartProvider = CartProvider;
+
+const qtyBtn = {
+  width: 28, height: 28, borderRadius: 999,
+  background: 'transparent', border: '1px solid var(--line)',
+  color: 'var(--ink)', cursor: 'pointer',
+  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+  fontSize: 16, lineHeight: 1, fontFamily: 'var(--sans)', padding: 0,
+};
+
+function CartDrawer() {
+  const { items, open, setOpen, remove, updateQty, total, count } = useCart();
+
+  const wa = React.useCallback(() => {
+    if (!items.length) return;
+    const lines = items.map(it => `• ${it.qty}x ${it.name} — ${fmtPrice(it.priceNum * it.qty)} FCFA`).join('\n');
+    const msg = `Bonjour Praline ✨\nJe souhaite commander :\n${lines}\nTotal : ${fmtPrice(total)} FCFA\nMerci 🙏`;
+    window.open(`https://wa.me/221770000000?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
+  }, [items, total]);
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div
+        onClick={() => setOpen(false)}
+        style={{
+          position: 'fixed', inset: 0, zIndex: 98,
+          background: 'rgba(26,15,8,0.48)',
+          backdropFilter: 'blur(3px)', WebkitBackdropFilter: 'blur(3px)',
+          opacity: open ? 1 : 0,
+          pointerEvents: open ? 'auto' : 'none',
+          transition: 'opacity .35s ease',
+        }}
+      />
+
+      {/* Drawer panel */}
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Votre sélection"
+        style={{
+          position: 'fixed', top: 0, right: 0, bottom: 0, zIndex: 99,
+          width: 'min(420px, 100vw)',
+          background: 'var(--paper)',
+          boxShadow: '-4px 0 32px rgba(26,15,8,.18), -1px 0 0 var(--line-2)',
+          transform: open ? 'translateX(0)' : 'translateX(100%)',
+          transition: 'transform .42s cubic-bezier(.2,.7,.2,1)',
+          display: 'flex', flexDirection: 'column',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Header */}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '22px 26px 20px',
+          borderBottom: '1px solid var(--line-2)',
+          flexShrink: 0,
+        }}>
+          <div>
+            <span className="eyebrow">Votre sélection</span>
+            <div className="serif" style={{ fontFamily: 'var(--serif)', fontStyle: 'italic', fontSize: 22, marginTop: 4, color: 'var(--ink)', lineHeight: 1.1 }}>
+              {count === 0 ? 'Panier vide' : `${count} pièce${count > 1 ? 's' : ''}`}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            aria-label="Fermer"
+            style={{
+              width: 36, height: 36, borderRadius: 999,
+              background: 'transparent', border: '1px solid var(--line)',
+              color: 'var(--ink-soft)', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+              <path d="M1 1l10 10M11 1L1 11"/>
+            </svg>
+          </button>
+        </div>
+
+        {/* Items */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
+          {items.length === 0 ? (
+            <div style={{
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              height: '100%', padding: '64px 32px', gap: 14, textAlign: 'center',
+            }}>
+              <span className="serif" style={{ fontFamily: 'var(--serif)', fontStyle: 'italic', fontSize: 24, color: 'var(--ink-soft)' }}>
+                Rien pour l'instant.
+              </span>
+              <p style={{ fontSize: 13, lineHeight: 1.65, color: 'var(--ink-mute)', margin: 0, maxWidth: 240 }}>
+                Ajoutez des pièces depuis la carte du jour ou les signatures.
+              </p>
+            </div>
+          ) : items.map(it => (
+            <div key={it.name} style={{
+              display: 'grid', gridTemplateColumns: '52px 1fr', gap: 14,
+              padding: '14px 26px',
+              borderBottom: '1px solid var(--line-2)',
+              alignItems: 'start',
+            }}>
+              <div style={{ width: 52, height: 52, borderRadius: 2, overflow: 'hidden', background: 'var(--bg-2)', flexShrink: 0 }}>
+                <img src={it.photo} alt="" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', gap: 8 }}>
+                  <span className="serif" style={{ fontFamily: 'var(--serif)', fontSize: 17, lineHeight: 1.2, color: 'var(--ink)', fontWeight: 400 }}>
+                    {it.name}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => remove(it.name)}
+                    aria-label={`Retirer ${it.name}`}
+                    style={{ background: 'transparent', border: 0, padding: 4, cursor: 'pointer', color: 'var(--ink-mute)', flexShrink: 0, lineHeight: 1 }}
+                  >
+                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                      <path d="M1 1l10 10M11 1L1 11"/>
+                    </svg>
+                  </button>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <button type="button" onClick={() => updateQty(it.name, -1)} style={qtyBtn} aria-label="Diminuer">−</button>
+                    <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--ink)', minWidth: 18, textAlign: 'center', fontVariantNumeric: 'tabular-nums' }}>
+                      {it.qty}
+                    </span>
+                    <button type="button" onClick={() => updateQty(it.name, 1)} style={qtyBtn} aria-label="Augmenter">+</button>
+                  </div>
+                  <span className="serif" style={{ fontFamily: 'var(--serif)', fontSize: 16, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>
+                    {fmtPrice(it.priceNum * it.qty)}&nbsp;<span style={{ fontSize: 10, color: 'var(--ink-mute)', letterSpacing: '0.18em' }}>CFA</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Footer */}
+        <div style={{ padding: '18px 26px 28px', borderTop: '1px solid var(--line)', background: 'var(--bg-2)', flexShrink: 0 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 18 }}>
+            <span style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--ink-mute)' }}>Total</span>
+            <span className="serif" style={{ fontFamily: 'var(--serif)', fontSize: 28, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>
+              {fmtPrice(total)}&nbsp;<span style={{ fontSize: 12, color: 'var(--ink-mute)', letterSpacing: '0.18em' }}>CFA</span>
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={wa}
+            disabled={items.length === 0}
+            style={{
+              width: '100%', padding: '15px 22px', borderRadius: 999,
+              background: items.length ? '#25D366' : 'var(--line)',
+              border: 0,
+              cursor: items.length ? 'pointer' : 'not-allowed',
+              color: items.length ? '#fff' : 'var(--ink-mute)',
+              fontFamily: 'var(--sans)', fontSize: 12, fontWeight: 500,
+              letterSpacing: '0.1em', textTransform: 'uppercase',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 11,
+              transition: 'background .25s ease',
+              minHeight: 52,
+            }}
+          >
+            <svg viewBox="0 0 32 32" width="17" height="17" fill="currentColor" aria-hidden="true">
+              <path d="M16.04 3.2C9.05 3.2 3.36 8.88 3.36 15.87c0 2.49.73 4.82 1.99 6.78L3 28.8l6.36-2.27a12.62 12.62 0 0 0 6.68 1.92h.01c6.99 0 12.68-5.68 12.68-12.68 0-3.39-1.32-6.57-3.71-8.97a12.6 12.6 0 0 0-8.98-3.6Zm0 23.18h-.01c-2 0-3.96-.54-5.66-1.55l-.4-.24-3.77 1.34 1.35-3.67-.27-.42a10.4 10.4 0 0 1-1.62-5.66c0-5.78 4.7-10.49 10.49-10.49 2.8 0 5.43 1.09 7.41 3.07a10.4 10.4 0 0 1 3.07 7.42c0 5.78-4.7 10.5-10.59 10.5Zm5.78-7.85c-.32-.16-1.88-.92-2.17-1.03-.29-.11-.5-.16-.7.16-.22.32-.82 1.03-1 1.24-.18.22-.37.24-.69.08-.32-.16-1.34-.5-2.55-1.58a9.55 9.55 0 0 1-1.77-2.2c-.18-.32-.02-.49.14-.65.14-.14.32-.37.48-.55.16-.18.21-.32.32-.53.11-.22.05-.4-.03-.56-.08-.16-.7-1.7-.97-2.32-.26-.6-.52-.52-.7-.53-.18-.01-.4-.01-.6-.01a1.16 1.16 0 0 0-.85.4c-.29.32-1.12 1.1-1.12 2.67 0 1.58 1.14 3.1 1.3 3.32.16.22 2.25 3.44 5.46 4.83.76.33 1.36.53 1.83.67.77.25 1.47.21 2.02.13.62-.09 1.88-.77 2.15-1.51.26-.74.26-1.38.18-1.51-.08-.13-.29-.21-.61-.37Z"/>
+            </svg>
+            Commander via WhatsApp
+          </button>
+          <p style={{ margin: '11px 0 0', fontSize: 11, textAlign: 'center', color: 'var(--ink-mute)', lineHeight: 1.5 }}>
+            Votre commande est transmise directement à l'équipe.
+          </p>
+        </div>
+      </div>
+      <style>{`
+        @media (max-width: 720px) {
+          .nav-cart-btn { width: 40px !important; height: 40px !important; }
+        }
+        [data-theme="dark"] .menu-prev-add {
+          box-shadow: 0 1px 3px rgba(0,0,0,.3) !important;
+        }
+        [data-theme="dark"] .sig-add-btn {
+          border-color: var(--line) !important;
+        }
+      `}</style>
+    </>
+  );
+}
+
 // ═══ Motion helper — fades children in on inView with spring ═════════════════
 function MotionIn({ as = 'div', children, delay = 0, y = 24, ...rest }) {
   const ref = React.useRef(null);
@@ -150,6 +384,7 @@ function InteractiveMenu() {
     { cat:'saison',       name:'Baba au rhum Cap-Skirring',  desc:'Imbibage rhum agricole, chantilly vanille du jardin',             price:'4 600', tag:'limité',     photo: FPHOTO.menu3 },
   ];
 
+  const cart = React.useContext(CartContext);
   const [active, setActive] = React.useState('all');
   const [expanded, setExpanded] = React.useState(false);
   const visible = dishes.filter(d => active === 'all' || d.cat === active);
@@ -263,6 +498,24 @@ function InteractiveMenu() {
                     <div className="menu-prev-price">
                       {d.price.trim()}<span> CFA</span>
                     </div>
+                    <button
+                      type="button"
+                      className="menu-prev-add"
+                      onClick={() => cart.add(d)}
+                      style={{
+                        marginTop: 10, width: '100%', padding: '10px 14px', borderRadius: 999,
+                        background: 'var(--ink)', color: 'var(--paper)', border: 0, cursor: 'pointer',
+                        fontFamily: 'var(--sans)', fontSize: 11, fontWeight: 500,
+                        letterSpacing: '0.14em', textTransform: 'uppercase',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                        minHeight: 40,
+                      }}
+                    >
+                      <svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                        <path d="M6 1v10M1 6h10"/>
+                      </svg>
+                      Ajouter
+                    </button>
                   </div>
                 </article>
               ))}
@@ -479,6 +732,7 @@ function MenuRow({ dish, delay = 0 }) {
   const ref = React.useRef(null);
   const [open, setOpen] = React.useState(false);
   const previewRef = React.useRef(null);
+  const cart = React.useContext(CartContext);
 
   React.useEffect(() => {
     if (!ref.current || !M) return;
@@ -560,14 +814,21 @@ function MenuRow({ dish, delay = 0 }) {
         }}>
           {dish.price.trim()} <span style={{ fontSize:11, color:'var(--ink-mute)', letterSpacing:'0.18em' }}>CFA</span>
         </div>
-        <span style={{
-          marginTop: 6, display:'inline-block', fontSize: 11, letterSpacing:'0.16em', textTransform:'uppercase',
-          color: open ? 'var(--accent)' : 'var(--ink-mute)', fontWeight: 500,
-          transition: 'color .25s ease, transform .25s ease',
-          transform: open ? 'translateX(4px)' : 'translateX(0)',
-        }}>
+        <button
+          type="button"
+          className="menu-add-btn"
+          onClick={(e) => { e.stopPropagation(); cart.add(dish); }}
+          style={{
+            marginTop: 6, display:'inline-block', fontSize: 11, letterSpacing:'0.16em', textTransform:'uppercase',
+            color: open ? 'var(--accent)' : 'var(--ink-mute)', fontWeight: 500,
+            transition: 'color .25s ease, transform .25s ease',
+            transform: open ? 'translateX(4px)' : 'translateX(0)',
+            background: 'transparent', border: 0, padding: 0, cursor: 'pointer',
+            fontFamily: 'var(--sans)',
+          }}
+        >
           Ajouter →
-        </span>
+        </button>
       </div>
 
       <style>{`
@@ -1215,5 +1476,5 @@ function TestimonialBand() {
 // Export
 Object.assign(window, {
   WhatsAppButton, InteractiveMenu, Reviews, InstagramFeed, MapSection, CTA, MotionIn,
-  TestimonialBand,
+  TestimonialBand, CartProvider, CartContext, useCart,
 });

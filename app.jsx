@@ -84,4 +84,4 @@ function Grain() {
   );
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+ReactDOM.createRoot(document.getElementById('root')).render(<CartProvider><App /></CartProvider>);
