@@ -155,19 +155,35 @@ function InteractiveMenu() {
   const visible = dishes.filter(d => active === 'all' || d.cat === active);
   const PREVIEW_COUNT = 3;
   const displayed = expanded ? visible : visible.slice(0, PREVIEW_COUNT);
+  // Mobile carousel — curated 6 dishes mixing signatures, viennoiserie and seasonal
+  const carouselDishes = React.useMemo(() => {
+    const featured = dishes.filter(d => d.tag === 'signature' || d.tag === 'iconique' || d.tag === 'nouveau');
+    const seasonal = dishes.filter(d => d.tag === 'limité');
+    const rest = dishes.filter(d => !d.tag);
+    return [...featured, ...seasonal, ...rest].slice(0, 6);
+  }, []);
+  const catLabel = (c) => ({
+    viennoiserie: 'Viennoiserie',
+    patisserie: 'Pâtisserie',
+    chocolat: 'Chocolat',
+    saison: 'De saison',
+  })[c] || c;
+
+  const expandMenu = React.useCallback(() => {
+    setExpanded(true);
+    // Smooth scroll to the revealed tabs/first row, after layout settles
+    setTimeout(() => {
+      const anchor = document.querySelector('.menu-expanded-anchor');
+      if (anchor) anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 60);
+  }, []);
 
   // Listen for expand event dispatched from Signatures CTA
   React.useEffect(() => {
-    const handler = () => {
-      setExpanded(true);
-      requestAnimationFrame(() => {
-        const el = document.getElementById('carte');
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
-    };
+    const handler = () => expandMenu();
     window.addEventListener('praline:expand-menu', handler);
     return () => window.removeEventListener('praline:expand-menu', handler);
-  }, []);
+  }, [expandMenu]);
 
   return (
     <section id="carte" className="menu-section" style={{ padding:'140px 0 160px', background:'var(--bg)' }}>
@@ -189,6 +205,7 @@ function InteractiveMenu() {
         </MotionIn>
 
         {/* Tabs — only shown once expanded */}
+        {expanded && <span className="menu-expanded-anchor" aria-hidden="true" style={{ display:'block', height: 0, scrollMarginTop: 88 }} />}
         {expanded && (
           <MotionIn delay={0.05} style={{
             display:'flex', flexWrap:'wrap', gap: 10, marginBottom: 56,
@@ -227,37 +244,57 @@ function InteractiveMenu() {
           </MotionIn>
         )}
 
-        {/* Preview rows (always visible) + smooth-revealed extras */}
+        {/* Mobile-only horizontal carousel — visible when collapsed */}
         {!expanded && (
-          <div style={{ marginBottom: 32 }}>
-            <span className="eyebrow" style={{ color: 'var(--ink-mute)' }}>— Aperçu</span>
+          <div className="menu-carousel-wrap" aria-label="Aperçu de la carte">
+            <div className="menu-carousel">
+              {carouselDishes.map((d, i) => (
+                <article key={d.name} className="menu-prev-card" style={{ animationDelay: `${i * 60}ms` }}>
+                  <div className="menu-prev-img">
+                    <img src={d.photo} alt={d.name} loading="lazy" decoding="async" />
+                  </div>
+                  <div className="menu-prev-body">
+                    <div className="menu-prev-meta">
+                      <span className="eyebrow">{catLabel(d.cat)}</span>
+                      {d.tag && <span className="menu-prev-tag">{d.tag}</span>}
+                    </div>
+                    <h4 className="serif menu-prev-name">{d.name}</h4>
+                    <p className="menu-prev-desc">{d.desc}</p>
+                    <div className="menu-prev-price">
+                      {d.price.trim()}<span> CFA</span>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
           </div>
         )}
 
-        <div style={{ display:'flex', flexDirection:'column' }}>
-          {displayed.map((d, i) => (
-            <MenuRow
-              key={d.name + active + (i < PREVIEW_COUNT ? 'p' : 'x')}
-              dish={d}
-              delay={i < PREVIEW_COUNT ? i * 0.04 : (i - PREVIEW_COUNT) * 0.04}
-            />
-          ))}
+        {/* Desktop preview rows + revealed full menu — hidden on mobile when collapsed */}
+        <div className={`menu-rows-block ${!expanded ? 'is-collapsed' : 'is-expanded'}`}>
+          {!expanded && (
+            <div style={{ marginBottom: 32 }}>
+              <span className="eyebrow" style={{ color: 'var(--ink-mute)' }}>— Aperçu</span>
+            </div>
+          )}
+          <div style={{ display:'flex', flexDirection:'column' }}>
+            {displayed.map((d, i) => (
+              <MenuRow
+                key={d.name + active + (i < PREVIEW_COUNT ? 'p' : 'x')}
+                dish={d}
+                delay={i < PREVIEW_COUNT ? i * 0.04 : (i - PREVIEW_COUNT) * 0.04}
+              />
+            ))}
+          </div>
         </div>
 
         {/* Expand CTA — refined, minimal */}
         {!expanded && (
-          <div style={{
-            textAlign: 'center', marginTop: 72,
-            position: 'relative',
-          }}>
-            <div aria-hidden="true" style={{
-              position: 'absolute', left: 0, right: 0, top: -56, height: 80,
-              background: 'linear-gradient(to bottom, transparent, var(--bg))',
-              pointerEvents: 'none',
-            }} />
+          <div className="menu-cta-wrap" style={{ textAlign: 'center', marginTop: 56 }}>
             <button
               type="button"
-              onClick={() => setExpanded(true)}
+              onClick={expandMenu}
+              className="menu-cta-btn"
               style={{
                 display:'inline-flex', alignItems:'center', gap: 14,
                 padding:'16px 28px', borderRadius: 999,
@@ -265,7 +302,8 @@ function InteractiveMenu() {
                 fontFamily:'var(--sans)', fontSize: 12, fontWeight: 500,
                 letterSpacing:'0.16em', textTransform:'uppercase',
                 border: 0, cursor:'pointer',
-                transition:'background .25s ease, transform .25s ease',
+                boxShadow:'0 1px 2px rgba(0,0,0,.04), 0 14px 36px -10px rgba(43,29,21,.25)',
+                transition:'background .25s ease, transform .25s ease, box-shadow .25s ease',
               }}
               onMouseEnter={e => { e.currentTarget.style.background = 'var(--accent)'; }}
               onMouseLeave={e => { e.currentTarget.style.background = 'var(--ink)'; }}
@@ -298,11 +336,139 @@ function InteractiveMenu() {
         )}
       </div>
       <style>{`
+        /* Desktop: hide mobile carousel */
+        .menu-carousel-wrap { display: none; }
+
         @media (max-width: 720px) {
-          .menu-section { padding: 64px 0 72px !important; }
+          .menu-section { padding: 56px 0 64px !important; overflow: visible !important; }
           .menu-section h2 { font-size: clamp(40px, 11vw, 64px) !important; }
-          .menu-section > .wrap > div:first-child { margin-bottom: 36px !important; }
+          .menu-section > .wrap > div:first-child { margin-bottom: 28px !important; }
           .menu-section > .wrap > div:first-child p { font-size: 13px !important; }
+
+          /* Hide desktop preview rows on mobile when collapsed */
+          .menu-rows-block.is-collapsed { display: none !important; }
+
+          /* Mobile horizontal carousel — editorial, premium, swipeable */
+          .menu-carousel-wrap {
+            display: block;
+            margin: 8px -20px 0;
+            padding: 4px 0 12px;
+          }
+          .menu-carousel {
+            display: flex;
+            gap: 14px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding: 6px 20px 12px;
+            scroll-padding-left: 20px;
+          }
+          .menu-carousel::-webkit-scrollbar { display: none; }
+          .menu-prev-card {
+            flex: 0 0 74%;
+            scroll-snap-align: start;
+            background: var(--paper);
+            border-left: 2px solid var(--accent);
+            box-shadow: var(--shadow-soft);
+            display: flex; flex-direction: column;
+            overflow: hidden;
+            opacity: 0;
+            animation: prevCardIn .7s cubic-bezier(.2,.7,.2,1) forwards;
+          }
+          @keyframes prevCardIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+          }
+          .menu-prev-img {
+            aspect-ratio: 4/3;
+            overflow: hidden;
+            background: var(--bg-2);
+          }
+          .menu-prev-img img {
+            width: 100%; height: 100%; object-fit: cover;
+            transition: transform 1.2s cubic-bezier(.2,.7,.2,1);
+          }
+          .menu-prev-body {
+            padding: 14px 16px 16px;
+            display: flex; flex-direction: column; gap: 4px;
+          }
+          .menu-prev-meta {
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 8px; margin-bottom: 2px;
+          }
+          .menu-prev-meta .eyebrow {
+            font-size: 9px !important;
+            letter-spacing: 0.18em !important;
+            color: var(--ink-mute) !important;
+          }
+          .menu-prev-tag {
+            font-size: 9px;
+            font-weight: 500;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            padding: 2px 7px;
+            border-radius: 999px;
+            white-space: nowrap;
+          }
+          .menu-prev-name {
+            font-family: var(--serif);
+            font-size: 19px;
+            line-height: 1.18;
+            margin: 4px 0 0;
+            font-weight: 400;
+            color: var(--ink);
+            letterSpacing: -0.005em;
+          }
+          .menu-prev-desc {
+            font-size: 12px;
+            line-height: 1.55;
+            color: var(--ink-soft);
+            margin: 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+          }
+          .menu-prev-price {
+            font-family: var(--serif);
+            font-size: 16px;
+            color: var(--ink);
+            margin-top: 8px;
+            padding-top: 10px;
+            border-top: 1px dashed var(--line);
+            font-variant-numeric: tabular-nums;
+          }
+          .menu-prev-price span {
+            font-size: 10px;
+            color: var(--ink-mute);
+            letter-spacing: 0.18em;
+          }
+
+          /* CTA wrap — ensure full visibility, no clipping, premium shadow preserved */
+          .menu-cta-wrap {
+            position: relative;
+            margin-top: 36px !important;
+            padding: 8px 0 4px;
+            overflow: visible;
+          }
+          .menu-cta-btn {
+            min-height: 48px;
+            padding: 15px 26px !important;
+            font-size: 11.5px !important;
+            letter-spacing: 0.14em !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 16px 30px -10px rgba(43,29,21,.28) !important;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+          }
+        }
+
+        /* Dark mode tuning for carousel cards */
+        [data-theme="dark"] .menu-prev-tag { border-color: var(--accent-2); color: var(--accent-2); }
+        [data-theme="dark"] .menu-cta-btn {
+          box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 16px 36px -10px rgba(0,0,0,.6) !important;
         }
       `}</style>
     </section>
