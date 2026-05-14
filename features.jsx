@@ -111,8 +111,14 @@ function WhatsAppButton() {
           100% { transform: scale(1.8); opacity: 0; }
         }
         @media (max-width: 720px) {
-          .wa-fab { bottom: max(16px, env(safe-area-inset-bottom)) !important; left: 16px !important; }
-          .wa-fab a { width: 52px !important; height: 52px !important; }
+          .wa-fab { bottom: max(14px, env(safe-area-inset-bottom)) !important; left: 14px !important; }
+          .wa-fab a {
+            width: 46px !important; height: 46px !important;
+            background: rgba(37,211,102,.94) !important;
+            box-shadow: 0 1px 3px rgba(60,40,22,.1), 0 10px 24px -8px rgba(37,211,102,.4) !important;
+          }
+          .wa-fab a svg { width: 22px !important; height: 22px !important; }
+          .wa-fab a span:first-child { display: none !important; }
         }
       `}</style>
     </div>
@@ -293,8 +299,10 @@ function InteractiveMenu() {
       </div>
       <style>{`
         @media (max-width: 720px) {
-          .menu-section { padding: 80px 0 88px !important; }
+          .menu-section { padding: 64px 0 72px !important; }
           .menu-section h2 { font-size: clamp(40px, 11vw, 64px) !important; }
+          .menu-section > .wrap > div:first-child { margin-bottom: 36px !important; }
+          .menu-section > .wrap > div:first-child p { font-size: 13px !important; }
         }
       `}</style>
     </section>
@@ -943,10 +951,11 @@ function CTA({ kind = 'reserve' }) {
       }}>Praline</div>
       <style>{`
         @media (max-width: 720px) {
-          #reserver h3 { font-size: clamp(44px, 12vw, 72px) !important; margin: 18px 0 24px !important; }
-          #reserver p { font-size: 14px !important; margin-bottom: 32px !important; }
-          .ghost-praline { font-size: 200px !important; right: -20px !important; top: -8px !important; }
-          #reserver a { padding: 14px 22px !important; }
+          #reserver { padding: 64px 0 !important; }
+          #reserver h3 { font-size: clamp(40px, 11vw, 64px) !important; margin: 14px 0 20px !important; }
+          #reserver p { font-size: 13.5px !important; margin-bottom: 28px !important; max-width: 360px !important; }
+          .ghost-praline { font-size: 180px !important; right: -16px !important; top: -8px !important; }
+          #reserver a { padding: 14px 22px !important; font-size: 12px !important; }
         }
       `}</style>
     </section>
@@ -1009,15 +1018,16 @@ function TestimonialBand() {
         borderTop:'1px solid var(--line-2)', borderBottom:'1px solid var(--line-2)',
         padding:'28px 0', overflow:'hidden',
       }}>
-      <div style={{ display:'flex', animation:'drift 90s linear infinite', width:'max-content' }}>
+      <div className="testi-track" style={{ display:'flex', animation:'drift 240s linear infinite', width:'max-content' }}>
         {row}{row}
       </div>
       <style>{`
         @media (max-width: 720px) {
-          .testi-band { padding: 18px 0 !important; }
-          .testi-band span.serif { font-size: 16px !important; }
-          .testi-band > div { gap: 48px !important; }
-          .testi-band > div > div { gap: 48px !important; padding-right: 48px !important; }
+          .testi-band { padding: 16px 0 !important; }
+          .testi-band span.serif { font-size: 15px !important; }
+          .testi-band > div { gap: 56px !important; }
+          .testi-band > div > div { gap: 56px !important; padding-right: 56px !important; }
+          .testi-track { animation-duration: 180s !important; }
         }
       `}</style>
     </section>

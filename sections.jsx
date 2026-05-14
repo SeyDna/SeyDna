@@ -182,7 +182,7 @@ function HeroSplit() {
     text: "Une pâtisserie pensée comme un atelier d'auteur — où chaque pièce porte le nom de son artisan, où l'on travaille en petite quantité, au rythme des saisons sénégalaises et des humeurs du beurre.",
     image: PHOTO.atelier,
     alt: "L'atelier des Almadies",
-    card: { eyebrow: "Notre philosophie", title: 'Villa Néma, Almadies', sub: '14 artisans · 3 fournées par jour' }
+    card: { eyebrow: "L'atelier", title: 'Villa Néma, Almadies', sub: '14 artisans · 3 fournées par jour' }
   }];
 
   const [idx, setIdx] = React.useState(0);
@@ -374,13 +374,18 @@ function HeroSplit() {
           }
         }
         @media (max-width: 720px) {
-          .hero-split { min-height: auto !important; padding-top: 96px !important; padding-bottom: 56px !important; }
-          .hero-split .hero-grid { min-height: 0 !important; padding-bottom: 24px !important; gap: 28px !important; }
-          .hero-split h1 { font-size: clamp(72px, 24vw, 120px) !important; }
-          .hero-split p.serif { font-size: 18px !important; }
-          .hero-split .reveal.d3 { min-height: 150px !important; margin-top: 24px !important; }
-          .hero-spec { right: 8px !important; bottom: -16px !important; min-width: 200px !important; max-width: 75% !important; padding: 12px 16px !important; }
-          .hero-spec .serif { font-size: 18px !important; }
+          .hero-split { min-height: auto !important; padding-top: 88px !important; padding-bottom: 40px !important; }
+          .hero-split .hero-grid { min-height: 0 !important; padding-bottom: 16px !important; gap: 22px !important; }
+          .hero-split h1 { font-size: clamp(64px, 21vw, 108px) !important; }
+          .hero-split p.serif { font-size: 17px !important; margin-top: 14px !important; }
+          .hero-split .reveal { margin-bottom: 22px !important; }
+          .hero-split .reveal.d3 { min-height: 110px !important; margin-top: 18px !important; }
+          .hero-split .reveal.d3 > p { font-size: 14.5px !important; line-height: 1.65 !important; }
+          .hero-split .reveal.d4 { margin-top: 24px !important; }
+          .hero-split .reveal.d4:last-of-type { margin-top: 36px !important; }
+          .hero-spec { right: 8px !important; bottom: -14px !important; min-width: 0 !important; max-width: 68% !important; padding: 10px 14px !important; }
+          .hero-spec .serif { font-size: 16px !important; }
+          .hero-spec .eyebrow { font-size: 9px !important; }
           .hero-scroll { display: none !important; }
         }
       `}</style>
@@ -593,16 +598,16 @@ function Signatures() {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 40 }} className="sig-grid">
           {items.map((it, i) =>
-          <article key={i} className={`reveal d${i + 1}`} style={{ position: 'relative' }}>
-              <div className="zoom" style={{
+          <article key={i} className={`reveal d${i + 1} sig-card`} style={{ position: 'relative' }}>
+              <div className="zoom sig-photo" style={{
               aspectRatio: '4/5', overflow: 'hidden', marginBottom: 24, background: 'var(--bg-2)'
             }}>
                 <img src={it.photo} alt={it.name} loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 16 }}>
-                <span className="eyebrow" style={{ color: 'var(--ink-mute)' }}>{it.n}</span>
+              <div className="sig-meta" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12 }}>
+                <span className="eyebrow" style={{ color: 'var(--ink-mute)', flex: 'none' }}>{it.n}</span>
                 <span style={{ flex: 1, borderTop: '1px dashed var(--line)', marginBottom: 4 }} />
-                <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--ink-soft)', letterSpacing: '0.02em' }}>{it.price}</span>
+                <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--ink-soft)', letterSpacing: '0.02em', whiteSpace: 'nowrap', flex: 'none' }}>{it.price}</span>
               </div>
               <h3 className="serif" style={{
               fontFamily: 'var(--serif)', fontSize: 30, lineHeight: 1.1, margin: '14px 0 12px',
@@ -638,10 +643,15 @@ function Signatures() {
           .sig-grid { grid-template-columns: 1fr 1fr !important; }
         }
         @media (max-width:720px) {
-          #patisseries { padding: 80px 0 88px !important; }
+          #patisseries { padding: 64px 0 72px !important; }
           #patisseries h2 { font-size: clamp(40px, 11vw, 64px) !important; }
-          .sig-grid { grid-template-columns: 1fr !important; gap: 44px !important; }
-          #patisseries h3 { font-size: 24px !important; }
+          #patisseries .reveal:first-child { margin-bottom: 40px !important; }
+          .sig-grid { grid-template-columns: 1fr !important; gap: 36px !important; }
+          .sig-photo { aspect-ratio: 5/4 !important; margin-bottom: 16px !important; }
+          .sig-card h3 { font-size: 22px !important; margin: 10px 0 8px !important; }
+          .sig-card p { font-size: 13px !important; line-height: 1.6 !important; }
+          .sig-meta .eyebrow { font-size: 10px !important; }
+          .sig-meta span:last-child { font-size: 12px !important; }
         }
       `}</style>
     </section>);
@@ -928,7 +938,7 @@ function Footer() {
           {[
           ['Maison', ['Histoire', 'Atelier', 'Presse', 'Carrières']],
           ['Boutique', ['Carte', 'Commander', 'Réserver une table', 'Carte cadeau']],
-          ['Suivre', ['Instagram', 'TikTok', 'Pinterest', 'Spotify']]].
+          ['Suivre', ['Instagram']]].
           map(([t, items], i) =>
           <div key={i}>
               <div className="eyebrow" style={{ color: 'var(--accent-2)', marginBottom: 18 }}>{t}</div>
@@ -954,9 +964,17 @@ function Footer() {
       <style>{`
         @media (max-width:980px) { .foot-grid { grid-template-columns: 1fr 1fr !important; gap: 48px !important; } }
         @media (max-width:720px) {
-          .foot-wordmark { font-size: clamp(56px, 22vw, 96px) !important; }
+          footer { padding: 56px 0 32px !important; }
+          .foot-wordmark { font-size: clamp(48px, 18vw, 80px) !important; }
+          .foot-grid { margin-top: 40px !important; padding-top: 28px !important; gap: 28px !important; }
+          .foot-grid > div:first-child .serif { font-size: 18px !important; margin-bottom: 12px !important; }
+          .foot-grid > div:first-child p { font-size: 12.5px !important; margin-bottom: 14px !important; }
+          .foot-grid ul { gap: 6px !important; }
+          .foot-grid ul li a { font-size: 13px !important; }
+          .foot-grid .eyebrow { margin-bottom: 12px !important; }
+          footer > div > div:last-child { margin-top: 40px !important; padding-top: 18px !important; font-size: 10px !important; }
         }
-        @media (max-width:560px) { .foot-grid { grid-template-columns: 1fr !important; } }
+        @media (max-width:560px) { .foot-grid { grid-template-columns: 1fr !important; gap: 24px !important; } }
       `}</style>
     </footer>);
 
