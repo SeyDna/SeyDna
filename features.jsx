@@ -5,18 +5,18 @@ const M = (typeof window !== 'undefined' && window.Motion) || null;
 
 // Extra photo set for Instagram + menu
 const FPHOTO = {
-  ig1: "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=600&q=85&auto=format&fit=crop",
-  ig2: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=600&q=85&auto=format&fit=crop",
-  ig3: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=600&q=85&auto=format&fit=crop",
-  ig4: "https://images.unsplash.com/photo-1606101273945-e9eba91c0dc4?w=600&q=85&auto=format&fit=crop",
-  ig5: "https://images.unsplash.com/photo-1612203985729-70726954388c?w=600&q=85&auto=format&fit=crop",
-  ig6: "https://images.unsplash.com/photo-1486427944299-d1955d23e34d?w=600&q=85&auto=format&fit=crop",
-  menu1: "https://images.unsplash.com/photo-1606101273945-e9eba91c0dc4?w=700&q=85&auto=format&fit=crop",
-  menu2: "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=700&q=85&auto=format&fit=crop",
-  menu3: "https://images.unsplash.com/photo-1464195244916-405fa0a82545?w=700&q=85&auto=format&fit=crop",
-  menu4: "https://images.unsplash.com/photo-1517433367423-c7e5b0f35086?w=700&q=85&auto=format&fit=crop",
-  menu5: "https://images.unsplash.com/photo-1610450949065-1f2841536c88?w=700&q=85&auto=format&fit=crop",
-  menu6: "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?w=700&q=85&auto=format&fit=crop",
+  ig1: "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=500&q=80&auto=format&fit=crop",
+  ig2: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=500&q=80&auto=format&fit=crop",
+  ig3: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=500&q=80&auto=format&fit=crop",
+  ig4: "https://images.unsplash.com/photo-1606101273945-e9eba91c0dc4?w=500&q=80&auto=format&fit=crop",
+  ig5: "https://images.unsplash.com/photo-1612203985729-70726954388c?w=500&q=80&auto=format&fit=crop",
+  ig6: "https://images.unsplash.com/photo-1486427944299-d1955d23e34d?w=500&q=80&auto=format&fit=crop",
+  menu1: "https://images.unsplash.com/photo-1606101273945-e9eba91c0dc4?w=600&q=80&auto=format&fit=crop",
+  menu2: "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=600&q=80&auto=format&fit=crop",
+  menu3: "https://images.unsplash.com/photo-1464195244916-405fa0a82545?w=600&q=80&auto=format&fit=crop",
+  menu4: "https://images.unsplash.com/photo-1517433367423-c7e5b0f35086?w=600&q=80&auto=format&fit=crop",
+  menu5: "https://images.unsplash.com/photo-1610450949065-1f2841536c88?w=600&q=80&auto=format&fit=crop",
+  menu6: "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?w=600&q=80&auto=format&fit=crop",
 };
 
 // ═══ Motion helper — fades children in on inView with spring ═════════════════
@@ -54,8 +54,9 @@ function WhatsAppButton() {
   }, []);
 
   return (
-    <div ref={ref} style={{
-      position:'fixed', bottom: 24, left: 24, zIndex: 60,
+    <div ref={ref} className="wa-fab" style={{
+      position:'fixed', bottom: 'max(20px, env(safe-area-inset-bottom))',
+      left: 20, zIndex: 60,
       display:'flex', alignItems:'center', gap: 12,
     }}>
       {/* Tooltip card */}
@@ -109,6 +110,10 @@ function WhatsAppButton() {
           80%  { transform: scale(1.8); opacity: 0; }
           100% { transform: scale(1.8); opacity: 0; }
         }
+        @media (max-width: 720px) {
+          .wa-fab { bottom: max(16px, env(safe-area-inset-bottom)) !important; left: 16px !important; }
+          .wa-fab a { width: 52px !important; height: 52px !important; }
+        }
       `}</style>
     </div>
   );
@@ -159,7 +164,7 @@ function InteractiveMenu() {
   }, []);
 
   return (
-    <section id="carte" style={{ padding:'140px 0 160px', background:'var(--bg)' }}>
+    <section id="carte" className="menu-section" style={{ padding:'140px 0 160px', background:'var(--bg)' }}>
       <div className="wrap">
         <MotionIn style={{ display:'flex', alignItems:'end', justifyContent:'space-between', gap: 32, flexWrap:'wrap', marginBottom: 56 }}>
           <div>
@@ -274,17 +279,24 @@ function InteractiveMenu() {
               type="button"
               onClick={() => setExpanded(false)}
               style={{
-                background:'transparent', border:0, padding:'8px 4px',
+                background:'transparent', border:0, padding:'12px 16px',
                 fontFamily:'var(--sans)', fontSize: 11, fontWeight: 500,
                 letterSpacing:'0.2em', textTransform:'uppercase',
                 color:'var(--ink-mute)', cursor:'pointer',
                 borderBottom: '1px solid var(--line)',
+                minHeight: 44,
               }}>
               Replier la carte
             </button>
           </div>
         )}
       </div>
+      <style>{`
+        @media (max-width: 720px) {
+          .menu-section { padding: 80px 0 88px !important; }
+          .menu-section h2 { font-size: clamp(40px, 11vw, 64px) !important; }
+        }
+      `}</style>
     </section>
   );
 }
@@ -314,14 +326,16 @@ function MenuRow({ dish, delay = 0 }) {
   return (
     <article
       ref={ref}
+      className="menu-row"
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
+      onClick={() => setOpen(o => !o)}
       style={{
         position:'relative',
         display:'grid', gridTemplateColumns:'80px 1fr 110px', gap: 24,
         alignItems:'center', padding:'28px 8px',
         borderBottom:'1px solid var(--line)',
-        cursor:'pointer',
+        cursor:'pointer', minHeight: 64,
       }}
     >
       {/* Hover preview image */}
@@ -334,7 +348,7 @@ function MenuRow({ dish, delay = 0 }) {
         boxShadow:'var(--shadow-lift)', overflow:'hidden',
         zIndex: 3, background:'var(--bg-2)',
       }} className="menu-preview">
-        <img src={dish.photo} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+        <img src={dish.photo} alt="" loading="lazy" decoding="async" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
       </div>
 
       <div className="serif" style={{
@@ -385,6 +399,11 @@ function MenuRow({ dish, delay = 0 }) {
       <style>{`
         @media (max-width: 720px) {
           .menu-preview { display: none !important; }
+          .menu-row { grid-template-columns: 1fr auto !important; gap: 14px !important; padding: 22px 4px !important; }
+          .menu-row > div:first-child { display: none !important; }
+          .menu-row h3 { font-size: 19px !important; line-height: 1.2 !important; }
+          .menu-row p { font-size: 13px !important; }
+          .menu-row > div:last-child .serif { font-size: 16px !important; }
         }
       `}</style>
     </article>
@@ -917,11 +936,19 @@ function CTA({ kind = 'reserve' }) {
         </MotionIn>
       </div>
       {/* Subtle floating serifs */}
-      <div aria-hidden="true" style={{
+      <div aria-hidden="true" className="ghost-praline" style={{
         position:'absolute', right: -40, top: -20, opacity: .04,
         fontFamily:'var(--serif)', fontSize: 380, fontStyle:'italic',
         color:'#F4EDE0', lineHeight: 1, pointerEvents:'none',
       }}>Praline</div>
+      <style>{`
+        @media (max-width: 720px) {
+          #reserver h3 { font-size: clamp(44px, 12vw, 72px) !important; margin: 18px 0 24px !important; }
+          #reserver p { font-size: 14px !important; margin-bottom: 32px !important; }
+          .ghost-praline { font-size: 200px !important; right: -20px !important; top: -8px !important; }
+          #reserver a { padding: 14px 22px !important; }
+        }
+      `}</style>
     </section>
   );
 }
@@ -976,6 +1003,7 @@ function TestimonialBand() {
   return (
     <section
       aria-label="Témoignages"
+      className="testi-band"
       style={{
         background:'var(--paper)',
         borderTop:'1px solid var(--line-2)', borderBottom:'1px solid var(--line-2)',
@@ -984,6 +1012,14 @@ function TestimonialBand() {
       <div style={{ display:'flex', animation:'drift 90s linear infinite', width:'max-content' }}>
         {row}{row}
       </div>
+      <style>{`
+        @media (max-width: 720px) {
+          .testi-band { padding: 18px 0 !important; }
+          .testi-band span.serif { font-size: 16px !important; }
+          .testi-band > div { gap: 48px !important; }
+          .testi-band > div > div { gap: 48px !important; padding-right: 48px !important; }
+        }
+      `}</style>
     </section>
   );
 }

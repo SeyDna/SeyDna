@@ -109,6 +109,51 @@
   /* Hide horizontal scrollbars */
   .scroller::-webkit-scrollbar { display:none; }
   .scroller { scrollbar-width: none; }
+
+  /* ───────── Mobile-first optimizations ───────── */
+  /* Tap targets baseline */
+  button, a[role="button"], .tap { -webkit-tap-highlight-color: transparent; }
+  /* Disable hover-zoom on touch devices */
+  @media (hover: none) {
+    .zoom:hover > img { transform: none; }
+  }
+  /* Soften heavy reveal motion on small/low-power devices */
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+    .zoom > img { transition: none !important; }
+  }
+
+  @media (max-width: 720px) {
+    body { font-size: 15px; line-height: 1.6; }
+    .eyebrow { font-size: 10px; letter-spacing: 0.18em; }
+
+    /* Section padding — global cap for any vertical >100px paddings */
+    section[style*="padding:'160px"],
+    section[style*="padding: '160px"],
+    section[style*="padding:'140px"],
+    section[style*="padding: '140px"],
+    section[style*="padding:'120px"],
+    section[style*="padding: '120px"],
+    section[style*="padding:'100px"],
+    section[style*="padding: '100px"],
+    section[style*="padding:'140px 0 160px"],
+    section[style*="padding:'120px 0 140px"] {
+      padding-top: 72px !important;
+      padding-bottom: 72px !important;
+    }
+
+    /* Footer top padding */
+    footer[style*="padding:'120px"], footer[style*="padding: '120px"] {
+      padding-top: 80px !important; padding-bottom: 48px !important;
+    }
+
+    /* CTA banners */
+    section[id="reserver"] { padding: 72px 0 !important; }
+
+    /* Tap targets: enforce 44px min on rounded buttons/links */
+    a[style*="border-radius: 999"],
+    button[style*="border-radius: 999"] { min-height: 44px; }
+  }
 </style>
 
 <!-- Inline edit defaults persisted by tweaks panel -->

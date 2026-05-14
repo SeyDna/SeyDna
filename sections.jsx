@@ -2,20 +2,20 @@
 // Editorial luxury layout — uses CSS vars from index.html
 
 const PHOTO = {
-  hero: "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=1600&q=85&auto=format&fit=crop",
-  signature1: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=900&q=85&auto=format&fit=crop", // éclair
-  signature2: "https://images.unsplash.com/photo-1612203985729-70726954388c?w=900&q=85&auto=format&fit=crop", // tarts
-  signature3: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=900&q=85&auto=format&fit=crop", // macarons
-  atelier: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=1400&q=85&auto=format&fit=crop", // café
-  gallery1: "https://images.unsplash.com/photo-1486427944299-d1955d23e34d?w=900&q=85&auto=format&fit=crop", // croissant
-  gallery2: "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=900&q=85&auto=format&fit=crop", // mille-feuille
-  gallery3: "https://images.unsplash.com/photo-1464195244916-405fa0a82545?w=900&q=85&auto=format&fit=crop", // strawberry tart
-  gallery4: "https://images.unsplash.com/photo-1517433367423-c7e5b0f35086?w=900&q=85&auto=format&fit=crop", // bread
-  gallery5: "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?w=900&q=85&auto=format&fit=crop", // pastry
-  gallery6: "https://images.unsplash.com/photo-1604152135912-04a022e23696?w=900&q=85&auto=format&fit=crop", // display
-  gallery7: "https://images.unsplash.com/photo-1610450949065-1f2841536c88?w=900&q=85&auto=format&fit=crop", // chocolate
-  gallery8: "https://images.unsplash.com/photo-1606101273945-e9eba91c0dc4?w=900&q=85&auto=format&fit=crop", // hand pastry
-  founder: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=900&q=85&auto=format&fit=crop" // chef
+  hero: "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=1200&q=80&auto=format&fit=crop",
+  signature1: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=800&q=80&auto=format&fit=crop", // éclair
+  signature2: "https://images.unsplash.com/photo-1612203985729-70726954388c?w=800&q=80&auto=format&fit=crop", // tarts
+  signature3: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=800&q=80&auto=format&fit=crop", // macarons
+  atelier: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=1100&q=80&auto=format&fit=crop", // café
+  gallery1: "https://images.unsplash.com/photo-1486427944299-d1955d23e34d?w=800&q=80&auto=format&fit=crop", // croissant
+  gallery2: "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=800&q=80&auto=format&fit=crop", // mille-feuille
+  gallery3: "https://images.unsplash.com/photo-1464195244916-405fa0a82545?w=800&q=80&auto=format&fit=crop", // strawberry tart
+  gallery4: "https://images.unsplash.com/photo-1517433367423-c7e5b0f35086?w=800&q=80&auto=format&fit=crop", // bread
+  gallery5: "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?w=800&q=80&auto=format&fit=crop", // pastry
+  gallery6: "https://images.unsplash.com/photo-1604152135912-04a022e23696?w=800&q=80&auto=format&fit=crop", // display
+  gallery7: "https://images.unsplash.com/photo-1610450949065-1f2841536c88?w=800&q=80&auto=format&fit=crop", // chocolate
+  gallery8: "https://images.unsplash.com/photo-1606101273945-e9eba91c0dc4?w=800&q=80&auto=format&fit=crop", // hand pastry
+  founder: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80&auto=format&fit=crop" // chef
 };
 
 // ─── Reveal-on-scroll hook ───────────────────────────────────────────────────
@@ -87,7 +87,7 @@ function Nav() {
           )}
         </nav>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <a href="#reserver" style={{
+          <a href="#reserver" className="nav-cta" style={{
             display: 'inline-flex', alignItems: 'center', gap: 8,
             padding: '10px 18px', borderRadius: 999,
             background: 'var(--ink)', color: 'var(--paper)',
@@ -99,18 +99,63 @@ function Nav() {
             Réserver
             <span style={{ width: 5, height: 5, borderRadius: 5, background: 'var(--paper)' }} />
           </a>
-          <button aria-label="Menu" onClick={() => setOpen((o) => !o)} className="nav-burger" style={{
-            background: 'transparent', border: 0, padding: 8, display: 'none'
+          <button aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
+            onClick={() => setOpen((o) => !o)} className="nav-burger" style={{
+            background: 'transparent', border: 0, padding: 10, display: 'none',
+            width: 44, height: 44, alignItems: 'center', justifyContent: 'center',
+            flexDirection: 'column', gap: 5
           }}>
-            <span style={{ display: 'block', width: 22, height: 1, background: 'var(--ink)' }} />
-            <span style={{ display: 'block', width: 22, height: 1, background: 'var(--ink)', marginTop: 6 }} />
+            <span style={{
+              display: 'block', width: 22, height: 1.2, background: 'var(--ink)',
+              transition: 'transform .3s ease',
+              transform: open ? 'translateY(3px) rotate(45deg)' : 'none'
+            }} />
+            <span style={{
+              display: 'block', width: 22, height: 1.2, background: 'var(--ink)',
+              transition: 'transform .3s ease',
+              transform: open ? 'translateY(-3px) rotate(-45deg)' : 'none'
+            }} />
           </button>
         </div>
       </div>
+
+      {/* Mobile drawer */}
+      <div className="nav-drawer" style={{
+        position: 'fixed', inset: 0, top: scrolled ? 64 : 80, zIndex: 49,
+        background: 'var(--bg)', display: 'none',
+        opacity: open ? 1 : 0, pointerEvents: open ? 'auto' : 'none',
+        transition: 'opacity .3s ease',
+      }}>
+        <nav style={{
+          padding: '40px 28px', display: 'flex', flexDirection: 'column', gap: 4,
+        }}>
+          {links.map(([label, href]) =>
+            <a key={href} href={href} onClick={() => setOpen(false)} style={{
+              fontFamily: 'var(--serif)', fontStyle: 'italic', fontSize: 32,
+              color: 'var(--ink)', padding: '18px 0',
+              borderBottom: '1px solid var(--line-2)', letterSpacing: '-0.01em',
+            }}>{label}</a>
+          )}
+          <a href="#reserver" onClick={() => setOpen(false)} style={{
+            marginTop: 32, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            gap: 10, padding: '18px 22px', borderRadius: 999,
+            background: 'var(--ink)', color: 'var(--paper)',
+            fontFamily: 'var(--sans)', fontSize: 13, fontWeight: 500,
+            letterSpacing: '0.12em', textTransform: 'uppercase',
+            minHeight: 56,
+          }}>
+            Réserver une table
+            <span style={{ width: 5, height: 5, borderRadius: 5, background: 'var(--paper)' }} />
+          </a>
+        </nav>
+      </div>
+
       <style>{`
         @media (max-width: 880px) {
           .nav-links { display: none !important; }
+          .nav-cta { display: none !important; }
           .nav-burger { display: inline-flex !important; }
+          .nav-drawer { display: block !important; }
         }
       `}</style>
     </header>);
@@ -150,13 +195,13 @@ function HeroSplit() {
   const KEN = 'transform 12s cubic-bezier(.2,.7,.2,1)';
 
   return (
-    <section style={{
-      position: 'relative', minHeight: '100vh', paddingTop: 80,
+    <section className="hero-split" style={{
+      position: 'relative', minHeight: '100svh', paddingTop: 80,
       background: 'var(--bg)'
     }}>
-      <div className="wrap" style={{
+      <div className="wrap hero-grid" style={{
         display: 'grid', gridTemplateColumns: '1.05fr 1fr', gap: 56,
-        alignItems: 'center', minHeight: 'calc(100vh - 80px)', paddingBottom: 48
+        alignItems: 'center', minHeight: 'calc(100svh - 80px)', paddingBottom: 48
       }}>
         <div style={{ paddingRight: 8 }}>
           <div className="reveal" style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 36 }}>
@@ -280,7 +325,7 @@ function HeroSplit() {
           </div>
 
           {/* Floating spec card — rotates with frame */}
-          <div className="reveal d4" style={{
+          <div className="reveal d4 hero-spec" style={{
             position: 'absolute', right: -8, bottom: -28,
             background: 'var(--paper)', padding: '16px 22px', borderRadius: 2,
             boxShadow: 'var(--shadow-soft)', minWidth: 240, maxWidth: 280,
@@ -307,7 +352,7 @@ function HeroSplit() {
       </div>
 
       {/* Scroll indicator */}
-      <div style={{
+      <div className="hero-scroll" style={{
         position: 'absolute', left: '50%', bottom: 24, transform: 'translateX(-50%)',
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10,
         color: 'var(--ink-mute)', fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase'
@@ -320,14 +365,23 @@ function HeroSplit() {
 
       <style>{`
         @media (max-width: 980px) {
-          section .wrap > div:first-child h1 { font-size: 22vw !important; }
+          .hero-split .hero-grid > div:first-child h1 { font-size: 22vw !important; }
         }
         @media (max-width: 880px) {
-          section .wrap[style*="grid-template-columns"] {
+          .hero-split .hero-grid {
             grid-template-columns: 1fr !important;
-            gap: 48px !important;
-            padding-top: 80px;
+            gap: 36px !important;
           }
+        }
+        @media (max-width: 720px) {
+          .hero-split { min-height: auto !important; padding-top: 96px !important; padding-bottom: 56px !important; }
+          .hero-split .hero-grid { min-height: 0 !important; padding-bottom: 24px !important; gap: 28px !important; }
+          .hero-split h1 { font-size: clamp(72px, 24vw, 120px) !important; }
+          .hero-split p.serif { font-size: 18px !important; }
+          .hero-split .reveal.d3 { min-height: 150px !important; margin-top: 24px !important; }
+          .hero-spec { right: 8px !important; bottom: -16px !important; min-width: 200px !important; max-width: 75% !important; padding: 12px 16px !important; }
+          .hero-spec .serif { font-size: 18px !important; }
+          .hero-scroll { display: none !important; }
         }
       `}</style>
     </section>);
@@ -426,13 +480,20 @@ function Marquee() {
     </div>;
 
   return (
-    <div style={{
+    <div className="marquee-band" style={{
       borderTop: '1px solid var(--line)', borderBottom: '1px solid var(--line)',
       background: 'var(--bg-2)', padding: '22px 0', overflow: 'hidden'
     }}>
       <div style={{ display: 'flex', animation: 'drift 50s linear infinite', width: 'max-content' }}>
         {row}{row}
       </div>
+      <style>{`
+        @media (max-width:720px) {
+          .marquee-band { padding: 16px 0 !important; }
+          .marquee-band span.serif { font-size: 20px !important; gap: 28px !important; }
+          .marquee-band > div { gap: 28px !important; }
+        }
+      `}</style>
     </div>);
 
 }
@@ -536,7 +597,7 @@ function Signatures() {
               <div className="zoom" style={{
               aspectRatio: '4/5', overflow: 'hidden', marginBottom: 24, background: 'var(--bg-2)'
             }}>
-                <img src={it.photo} alt={it.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src={it.photo} alt={it.name} loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 16 }}>
                 <span className="eyebrow" style={{ color: 'var(--ink-mute)' }}>{it.n}</span>
@@ -576,8 +637,11 @@ function Signatures() {
         @media (max-width:980px) {
           .sig-grid { grid-template-columns: 1fr 1fr !important; }
         }
-        @media (max-width:680px) {
-          .sig-grid { grid-template-columns: 1fr !important; gap: 56px !important; }
+        @media (max-width:720px) {
+          #patisseries { padding: 80px 0 88px !important; }
+          #patisseries h2 { font-size: clamp(40px, 11vw, 64px) !important; }
+          .sig-grid { grid-template-columns: 1fr !important; gap: 44px !important; }
+          #patisseries h3 { font-size: 24px !important; }
         }
       `}</style>
     </section>);
@@ -826,8 +890,8 @@ function Footer() {
   return (
     <footer style={{ background: 'var(--ink)', color: '#E4D8C2', padding: '120px 0 56px', position: 'relative' }}>
       <div className="wrap">
-        <div className="reveal" style={{
-          fontFamily: 'var(--serif)', fontSize: 'clamp(80px, 18vw, 280px)', lineHeight: 0.86,
+        <div className="reveal foot-wordmark" style={{
+          fontFamily: 'var(--serif)', fontSize: 'clamp(72px, 18vw, 280px)', lineHeight: 0.86,
           letterSpacing: '-0.03em', color: '#F4EDE0', margin: 0
         }}>
           Pra<em style={{ color: 'var(--accent-2)' }}>line</em>.
@@ -889,6 +953,9 @@ function Footer() {
       </div>
       <style>{`
         @media (max-width:980px) { .foot-grid { grid-template-columns: 1fr 1fr !important; gap: 48px !important; } }
+        @media (max-width:720px) {
+          .foot-wordmark { font-size: clamp(56px, 22vw, 96px) !important; }
+        }
         @media (max-width:560px) { .foot-grid { grid-template-columns: 1fr !important; } }
       `}</style>
     </footer>);
