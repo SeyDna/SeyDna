@@ -1,7 +1,6 @@
-// app.jsx — Praline (editorial full edition restored)
-// Hero → Marquee → Manifesto → Signatures → CTA reserve → InteractiveMenu
-// → Atelier → Gallery → Reviews → CTA gift → InstagramFeed → MapSection
-// → Visit → Footer  + floating WhatsApp button
+// app.jsx — Praline (refined edition)
+// Hero (rotating text + image) → Marquee → Signatures → InteractiveMenu
+// → CTA reserve → TestimonialBand → Footer  + floating WhatsApp button
 
 function App() {
   const [t, setTweak] = useTweaks(window.TWEAK_DEFAULTS);
@@ -26,17 +25,10 @@ function App() {
       <main>
         <Hero variant={t.hero} />
         <Marquee />
-        <Manifesto />
         <Signatures />
-        <CTA kind="reserve" />
         <InteractiveMenu />
-        <Atelier />
-        <Gallery />
-        <Reviews />
-        <CTA kind="gift" />
-        <InstagramFeed />
-        <MapSection />
-        <Visit />
+        <CTA kind="reserve" />
+        <TestimonialBand />
       </main>
       <Footer />
 

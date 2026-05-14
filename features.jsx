@@ -140,7 +140,23 @@ function InteractiveMenu() {
   ];
 
   const [active, setActive] = React.useState('all');
+  const [expanded, setExpanded] = React.useState(false);
   const visible = dishes.filter(d => active === 'all' || d.cat === active);
+  const PREVIEW_COUNT = 3;
+  const displayed = expanded ? visible : visible.slice(0, PREVIEW_COUNT);
+
+  // Listen for expand event dispatched from Signatures CTA
+  React.useEffect(() => {
+    const handler = () => {
+      setExpanded(true);
+      requestAnimationFrame(() => {
+        const el = document.getElementById('carte');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    };
+    window.addEventListener('praline:expand-menu', handler);
+    return () => window.removeEventListener('praline:expand-menu', handler);
+  }, []);
 
   return (
     <section id="carte" style={{ padding:'140px 0 160px', background:'var(--bg)' }}>
@@ -161,49 +177,113 @@ function InteractiveMenu() {
           </p>
         </MotionIn>
 
-        {/* Tabs */}
-        <MotionIn delay={0.1} style={{
-          display:'flex', flexWrap:'wrap', gap: 10, marginBottom: 56,
-          borderBottom:'1px solid var(--line)', paddingBottom: 0,
-        }}>
-          {categories.map(c => {
-            const isActive = active === c.id;
-            return (
-              <button key={c.id} onClick={()=>setActive(c.id)} style={{
-                position:'relative',
-                background:'transparent', border:0,
-                padding:'14px 22px',
-                fontFamily:'var(--sans)', fontSize: 13, fontWeight: 500,
-                letterSpacing:'0.05em', textTransform:'uppercase',
-                color: isActive ? 'var(--ink)' : 'var(--ink-mute)',
-                transition:'color .25s ease',
-                display:'inline-flex', alignItems:'center', gap: 10,
-              }}>
-                {c.label}
-                <span style={{
-                  fontSize: 10, color: isActive ? 'var(--accent)' : 'var(--ink-mute)',
-                  fontVariantNumeric:'tabular-nums', opacity: .8,
+        {/* Tabs — only shown once expanded */}
+        {expanded && (
+          <MotionIn delay={0.05} style={{
+            display:'flex', flexWrap:'wrap', gap: 10, marginBottom: 56,
+            borderBottom:'1px solid var(--line)', paddingBottom: 0,
+          }}>
+            {categories.map(c => {
+              const isActive = active === c.id;
+              return (
+                <button key={c.id} onClick={()=>setActive(c.id)} style={{
+                  position:'relative',
+                  background:'transparent', border:0,
+                  padding:'14px 22px',
+                  fontFamily:'var(--sans)', fontSize: 13, fontWeight: 500,
+                  letterSpacing:'0.05em', textTransform:'uppercase',
+                  color: isActive ? 'var(--ink)' : 'var(--ink-mute)',
+                  transition:'color .25s ease',
+                  display:'inline-flex', alignItems:'center', gap: 10,
                 }}>
-                  {String(c.count).padStart(2,'0')}
-                </span>
-                <span style={{
-                  position:'absolute', left: 0, right: 0, bottom: -1, height: 2,
-                  background: isActive ? 'var(--ink)' : 'transparent',
-                  transform: isActive ? 'scaleX(1)' : 'scaleX(0)',
-                  transformOrigin:'left',
-                  transition:'transform .35s cubic-bezier(.2,.7,.2,1), background .25s ease',
-                }} />
-              </button>
-            );
-          })}
-        </MotionIn>
+                  {c.label}
+                  <span style={{
+                    fontSize: 10, color: isActive ? 'var(--accent)' : 'var(--ink-mute)',
+                    fontVariantNumeric:'tabular-nums', opacity: .8,
+                  }}>
+                    {String(c.count).padStart(2,'0')}
+                  </span>
+                  <span style={{
+                    position:'absolute', left: 0, right: 0, bottom: -1, height: 2,
+                    background: isActive ? 'var(--ink)' : 'transparent',
+                    transform: isActive ? 'scaleX(1)' : 'scaleX(0)',
+                    transformOrigin:'left',
+                    transition:'transform .35s cubic-bezier(.2,.7,.2,1), background .25s ease',
+                  }} />
+                </button>
+              );
+            })}
+          </MotionIn>
+        )}
 
-        {/* Menu rows */}
+        {/* Preview rows (always visible) + smooth-revealed extras */}
+        {!expanded && (
+          <div style={{ marginBottom: 32 }}>
+            <span className="eyebrow" style={{ color: 'var(--ink-mute)' }}>— Aperçu</span>
+          </div>
+        )}
+
         <div style={{ display:'flex', flexDirection:'column' }}>
-          {visible.map((d, i) => (
-            <MenuRow key={d.name + active} dish={d} delay={i * 0.04} />
+          {displayed.map((d, i) => (
+            <MenuRow
+              key={d.name + active + (i < PREVIEW_COUNT ? 'p' : 'x')}
+              dish={d}
+              delay={i < PREVIEW_COUNT ? i * 0.04 : (i - PREVIEW_COUNT) * 0.04}
+            />
           ))}
         </div>
+
+        {/* Expand CTA — refined, minimal */}
+        {!expanded && (
+          <div style={{
+            textAlign: 'center', marginTop: 72,
+            position: 'relative',
+          }}>
+            <div aria-hidden="true" style={{
+              position: 'absolute', left: 0, right: 0, top: -56, height: 80,
+              background: 'linear-gradient(to bottom, transparent, var(--bg))',
+              pointerEvents: 'none',
+            }} />
+            <button
+              type="button"
+              onClick={() => setExpanded(true)}
+              style={{
+                display:'inline-flex', alignItems:'center', gap: 14,
+                padding:'16px 28px', borderRadius: 999,
+                background:'var(--ink)', color:'var(--paper)',
+                fontFamily:'var(--sans)', fontSize: 12, fontWeight: 500,
+                letterSpacing:'0.16em', textTransform:'uppercase',
+                border: 0, cursor:'pointer',
+                transition:'background .25s ease, transform .25s ease',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'var(--accent)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'var(--ink)'; }}
+            >
+              Voir les 42 pièces de la carte
+              <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
+                <path d="M1 5h12M9 1l4 4-4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          </div>
+        )}
+
+        {/* Collapse CTA — visible once expanded */}
+        {expanded && (
+          <div style={{ textAlign: 'center', marginTop: 64 }}>
+            <button
+              type="button"
+              onClick={() => setExpanded(false)}
+              style={{
+                background:'transparent', border:0, padding:'8px 4px',
+                fontFamily:'var(--sans)', fontSize: 11, fontWeight: 500,
+                letterSpacing:'0.2em', textTransform:'uppercase',
+                color:'var(--ink-mute)', cursor:'pointer',
+                borderBottom: '1px solid var(--line)',
+              }}>
+              Replier la carte
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );
@@ -804,7 +884,7 @@ function CTA({ kind = 'reserve' }) {
 
   // 'reserve' banner — dark, full-bleed
   return (
-    <section style={{ background:'var(--ink)', color:'#F4EDE0', padding:'120px 0', position:'relative', overflow:'hidden' }}>
+    <section id="reserver" style={{ background:'var(--ink)', color:'#F4EDE0', padding:'120px 0', position:'relative', overflow:'hidden' }}>
       <div className="wrap" style={{ textAlign:'center', position:'relative', zIndex: 2 }}>
         <MotionIn>
           <span className="eyebrow" style={{ color:'rgba(244,237,224,.55)' }}>— Une table à Praline</span>
@@ -860,7 +940,56 @@ const ghostCTA = {
   color:'var(--ink)', fontSize: 13, fontWeight: 500, letterSpacing:'0.08em', textTransform:'uppercase',
 };
 
+// ═══ Subtle horizontal testimonial band ═══════════════════════════════════════
+// Sits directly below the "Une table à Praline" (reserve) CTA banner.
+// Minimal, slow, continuous horizontal drift — editorial pull-quotes.
+function TestimonialBand() {
+  const items = [
+    { text: 'Une élégance rare, sans ostentation.', who: 'Aïssatou Ba — Architecte, Dakar' },
+    { text: 'Awa a un toucher exceptionnel.',       who: 'Olivier Maréchal — Chef pâtissier, Paris' },
+    { text: 'Pas un kouign-amann plus juste à Dakar.', who: 'Marième Sow — Le Soleil' },
+    { text: 'Précision parisienne, âme dakaroise.', who: 'Lucas Petit — Sommelier, Genève' },
+    { text: 'Une nouvelle grammaire de la pâtisserie.', who: 'Le Monde — Goûts' },
+    { text: 'Le bissap dialogue avec le beurre.',   who: 'Vogue Paris' },
+  ];
+
+  const row = (
+    <div style={{ display:'flex', gap: 80, paddingRight: 80, whiteSpace:'nowrap', alignItems:'center' }}>
+      {items.map((t, i) => (
+        <span key={i} style={{ display:'inline-flex', alignItems:'center', gap: 80 }}>
+          <span style={{ display:'inline-flex', alignItems:'baseline', gap: 18 }}>
+            <span className="serif" style={{
+              fontFamily:'var(--serif)', fontStyle:'italic', fontWeight: 300,
+              fontSize: 22, color:'var(--ink)', letterSpacing:'-0.005em',
+            }}>« {t.text} »</span>
+            <span style={{
+              fontFamily:'var(--sans)', fontSize: 11, fontWeight: 500,
+              letterSpacing:'0.18em', textTransform:'uppercase', color:'var(--ink-mute)',
+            }}>{t.who}</span>
+          </span>
+          <span style={{ width: 5, height: 5, borderRadius: 5, background:'var(--accent)', flex:'none' }} />
+        </span>
+      ))}
+    </div>
+  );
+
+  return (
+    <section
+      aria-label="Témoignages"
+      style={{
+        background:'var(--paper)',
+        borderTop:'1px solid var(--line-2)', borderBottom:'1px solid var(--line-2)',
+        padding:'28px 0', overflow:'hidden',
+      }}>
+      <div style={{ display:'flex', animation:'drift 90s linear infinite', width:'max-content' }}>
+        {row}{row}
+      </div>
+    </section>
+  );
+}
+
 // Export
 Object.assign(window, {
   WhatsAppButton, InteractiveMenu, Reviews, InstagramFeed, MapSection, CTA, MotionIn,
+  TestimonialBand,
 });

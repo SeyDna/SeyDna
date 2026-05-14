@@ -55,9 +55,8 @@ function Nav() {
   }, []);
   const links = [
   ['Pâtisseries', '#patisseries'],
-  ['Atelier', '#atelier'],
-  ['Cadeaux', 'cadeaux.html'],
-  ['Visiter', '#visiter']];
+  ['La carte', '#carte'],
+  ['Cadeaux & événements', 'cadeaux.html']];
 
   return (
     <header style={{
@@ -88,7 +87,7 @@ function Nav() {
           )}
         </nav>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <a href="#visiter" style={{
+          <a href="#reserver" style={{
             display: 'inline-flex', alignItems: 'center', gap: 8,
             padding: '10px 18px', borderRadius: 999,
             background: 'var(--ink)', color: 'var(--paper)',
@@ -138,16 +137,17 @@ function HeroSplit() {
     text: "Une pâtisserie pensée comme un atelier d'auteur — où chaque pièce porte le nom de son artisan, où l'on travaille en petite quantité, au rythme des saisons sénégalaises et des humeurs du beurre.",
     image: PHOTO.atelier,
     alt: "L'atelier des Almadies",
-    card: { eyebrow: "L'atelier", title: 'Villa Néma, Almadies', sub: '14 artisans · 3 fournées par jour' }
+    card: { eyebrow: "Notre philosophie", title: 'Villa Néma, Almadies', sub: '14 artisans · 3 fournées par jour' }
   }];
 
   const [idx, setIdx] = React.useState(0);
   React.useEffect(() => {
-    const t = setInterval(() => setIdx((i) => (i + 1) % frames.length), 8000);
+    const t = setInterval(() => setIdx((i) => (i + 1) % frames.length), 10000);
     return () => clearInterval(t);
   }, []);
-  const FADE = 'opacity 1.6s cubic-bezier(.4,0,.2,1)';
-  const KEN = 'transform 9s cubic-bezier(.2,.7,.2,1)';
+  // Slower, more cinematic transitions
+  const FADE = 'opacity 2.2s cubic-bezier(.4,0,.2,1)';
+  const KEN = 'transform 12s cubic-bezier(.2,.7,.2,1)';
 
   return (
     <section style={{
@@ -210,10 +210,10 @@ function HeroSplit() {
                 <path d="M1 5h12M9 1l4 4-4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </a>
-            <a href="#atelier" style={{
+            <a href="#carte" style={{
               fontSize: 13, fontWeight: 500, letterSpacing: '0.06em', textTransform: 'uppercase',
               color: 'var(--ink-soft)', borderBottom: '1px solid var(--line)', paddingBottom: 4
-            }}>Notre histoire</a>
+            }}>La carte du jour</a>
           </div>
 
           {/* Frame indicator */}
