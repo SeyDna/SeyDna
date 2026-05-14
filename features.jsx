@@ -77,6 +77,15 @@ const qtyBtn = {
 function CartDrawer() {
   const { items, open, setOpen, remove, updateQty, total, count } = useCart();
 
+  React.useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e) => { if (e.key === 'Escape') setOpen(false); };
+    window.addEventListener('keydown', onKey);
+    return () => { document.body.style.overflow = prev; window.removeEventListener('keydown', onKey); };
+  }, [open, setOpen]);
+
   const wa = React.useCallback(() => {
     if (!items.length) return;
     const lines = items.map(it => `• ${it.qty}x ${it.name} — ${fmtPrice(it.priceNum * it.qty)} FCFA`).join('\n');
