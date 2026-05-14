@@ -112,7 +112,8 @@ function CartDrawer() {
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Votre sélection"
+        aria-label="Votre commande"
+        className="cart-drawer-panel"
         style={{
           position: 'fixed', top: 0, right: 0, bottom: 0, zIndex: 99,
           width: 'min(420px, 100vw)',
@@ -134,7 +135,9 @@ function CartDrawer() {
           <div>
             <span className="eyebrow">Votre sélection</span>
             <div className="serif" style={{ fontFamily: 'var(--serif)', fontStyle: 'italic', fontSize: 22, marginTop: 4, color: 'var(--ink)', lineHeight: 1.1 }}>
-              {count === 0 ? 'Panier vide' : `${count} pièce${count > 1 ? 's' : ''}`}
+              {count === 0
+                ? <span style={{ color: 'var(--ink-mute)', fontStyle: 'normal', fontSize: 14, letterSpacing: '0.04em', fontFamily: 'var(--sans)' }}>Panier vide</span>
+                : <span className="serif">{count} pièce{count > 1 ? 's' : ''}</span>}
             </div>
           </div>
           <button
@@ -159,14 +162,19 @@ function CartDrawer() {
         <div style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
           {items.length === 0 ? (
             <div style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-              height: '100%', padding: '64px 32px', gap: 14, textAlign: 'center',
+              display: 'flex', flexDirection: 'column', alignItems: 'center',
+              padding: '64px 28px', gap: 16, textAlign: 'center',
             }}>
-              <span className="serif" style={{ fontFamily: 'var(--serif)', fontStyle: 'italic', fontSize: 24, color: 'var(--ink-soft)' }}>
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--line)" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <path d="M16 10a4 4 0 0 1-8 0"/>
+              </svg>
+              <span className="serif" style={{ fontFamily: 'var(--serif)', fontStyle: 'italic', fontSize: 22, color: 'var(--ink-soft)' }}>
                 Rien pour l'instant.
               </span>
-              <p style={{ fontSize: 13, lineHeight: 1.65, color: 'var(--ink-mute)', margin: 0, maxWidth: 240 }}>
-                Ajoutez des pièces depuis la carte du jour ou les signatures.
+              <p style={{ fontSize: 13, lineHeight: 1.65, color: 'var(--ink-mute)', margin: 0, maxWidth: 200 }}>
+                Ajoutez des pièces depuis la carte ou les signatures.
               </p>
             </div>
           ) : items.map(it => (
@@ -214,12 +222,14 @@ function CartDrawer() {
 
         {/* Footer */}
         <div style={{ padding: '18px 26px 28px', borderTop: '1px solid var(--line)', background: 'var(--bg-2)', flexShrink: 0 }}>
+          {items.length > 0 && (
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 18 }}>
             <span style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--ink-mute)' }}>Total</span>
             <span className="serif" style={{ fontFamily: 'var(--serif)', fontSize: 28, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>
               {fmtPrice(total)}&nbsp;<span style={{ fontSize: 12, color: 'var(--ink-mute)', letterSpacing: '0.18em' }}>CFA</span>
             </span>
           </div>
+          )}
           <button
             type="button"
             onClick={wa}
@@ -248,14 +258,17 @@ function CartDrawer() {
         </div>
       </div>
       <style>{`
-        @media (max-width: 720px) {
-          .nav-cart-btn { width: 40px !important; height: 40px !important; }
-        }
+        /* Dark mode: invert add buttons to cream-on-espresso */
         [data-theme="dark"] .menu-prev-add {
-          box-shadow: 0 1px 3px rgba(0,0,0,.3) !important;
+          background: var(--accent) !important;
+          color: var(--bg) !important;
         }
         [data-theme="dark"] .sig-add-btn {
           border-color: var(--line) !important;
+        }
+        /* Cart drawer shadow is stronger in dark */
+        [data-theme="dark"] .cart-drawer-panel {
+          box-shadow: -4px 0 40px rgba(0,0,0,.6), -1px 0 0 rgba(235,220,196,0.08) !important;
         }
       `}</style>
     </>
