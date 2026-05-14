@@ -74,7 +74,7 @@ function App() {
 
 function Grain() {
   return (
-    <div aria-hidden="true" style={{
+    <div aria-hidden="true" className="grain-overlay" style={{
       position:'fixed', inset: 0, pointerEvents:'none', zIndex: 40,
       opacity: 0.06, mixBlendMode:'multiply',
       backgroundImage: 'url("data:image/svg+xml;utf8,' +

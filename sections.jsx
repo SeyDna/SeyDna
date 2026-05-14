@@ -30,6 +30,73 @@ function useReveal() {
   }, []);
 }
 
+// ─── Theme toggle — refined sun/moon, integrated into nav ────────────────────
+function useTheme() {
+  const [theme, setTheme] = React.useState(() => {
+    if (typeof document === 'undefined') return 'light';
+    return document.documentElement.getAttribute('data-theme') || 'light';
+  });
+  const toggle = React.useCallback(() => {
+    setTheme(prev => {
+      const next = prev === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('praline-theme', next); } catch (e) {}
+      return next;
+    });
+  }, []);
+  return [theme, toggle];
+}
+
+function ThemeToggle({ size = 36, inline = false }) {
+  const [theme, toggle] = useTheme();
+  const isDark = theme === 'dark';
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      aria-label={isDark ? 'Activer le mode clair' : 'Activer le mode sombre'}
+      title={isDark ? 'Mode clair' : 'Mode sombre'}
+      className="theme-toggle"
+      style={{
+        position: 'relative',
+        width: size, height: size,
+        background: 'transparent',
+        border: inline ? '0' : '1px solid var(--line)',
+        borderRadius: 999,
+        color: 'var(--ink-soft)',
+        cursor: 'pointer',
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+        transition: 'color .25s ease, border-color .25s ease, background .25s ease',
+        overflow: 'hidden',
+      }}
+      onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--ink)'; e.currentTarget.style.borderColor = 'var(--ink-soft)'; }}
+      onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--ink-soft)'; e.currentTarget.style.borderColor = 'var(--line)'; }}
+    >
+      {/* Sun */}
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4"
+        style={{
+          position: 'absolute',
+          opacity: isDark ? 0 : 1,
+          transform: isDark ? 'rotate(90deg) scale(.4)' : 'rotate(0) scale(1)',
+          transition: 'opacity .4s cubic-bezier(.2,.7,.2,1), transform .5s cubic-bezier(.2,.7,.2,1)',
+        }}>
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" strokeLinecap="round"/>
+      </svg>
+      {/* Moon */}
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"
+        style={{
+          position: 'absolute',
+          opacity: isDark ? 1 : 0,
+          transform: isDark ? 'rotate(0) scale(1)' : 'rotate(-90deg) scale(.4)',
+          transition: 'opacity .4s cubic-bezier(.2,.7,.2,1), transform .5s cubic-bezier(.2,.7,.2,1)',
+        }}>
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+      </svg>
+    </button>
+  );
+}
+
 // ─── Logo wordmark ───────────────────────────────────────────────────────────
 function Wordmark({ size = 22 }) {
   return (
@@ -87,6 +154,7 @@ function Nav() {
           )}
         </nav>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <ThemeToggle size={36} />
           <a href="#reserver" className="nav-cta" style={{
             display: 'inline-flex', alignItems: 'center', gap: 8,
             padding: '10px 18px', borderRadius: 999,
@@ -136,6 +204,16 @@ function Nav() {
               borderBottom: '1px solid var(--line-2)', letterSpacing: '-0.01em',
             }}>{label}</a>
           )}
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '24px 0 8px',
+          }}>
+            <span style={{
+              fontFamily: 'var(--sans)', fontSize: 11, fontWeight: 500,
+              letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--ink-mute)',
+            }}>Apparence</span>
+            <ThemeToggle size={40} />
+          </div>
           <a href="#reserver" onClick={() => setOpen(false)} style={{
             marginTop: 32, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
             gap: 10, padding: '18px 22px', borderRadius: 999,
@@ -982,5 +1060,6 @@ function Footer() {
 
 // Export for app.jsx
 Object.assign(window, {
-  useReveal, Nav, Hero, Marquee, Manifesto, Signatures, Atelier, Gallery, Press, Visit, Footer, Wordmark
+  useReveal, Nav, Hero, Marquee, Manifesto, Signatures, Atelier, Gallery, Press, Visit, Footer, Wordmark,
+  ThemeToggle, useTheme
 });
