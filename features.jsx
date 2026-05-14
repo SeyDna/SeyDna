@@ -407,11 +407,23 @@ function MenuRow({ dish, delay = 0 }) {
       <style>{`
         @media (max-width: 720px) {
           .menu-preview { display: none !important; }
-          .menu-row { grid-template-columns: 1fr auto !important; gap: 14px !important; padding: 22px 4px !important; }
+          /* 2-col layout: title block left, price block right (top-aligned) */
+          .menu-row {
+            grid-template-columns: 1fr auto !important;
+            column-gap: 16px !important;
+            row-gap: 0 !important;
+            padding: 20px 0 !important;
+            min-height: 0 !important;
+            align-items: start !important;
+          }
           .menu-row > div:first-child { display: none !important; }
-          .menu-row h3 { font-size: 19px !important; line-height: 1.2 !important; }
-          .menu-row p { font-size: 13px !important; }
-          .menu-row > div:last-child .serif { font-size: 16px !important; }
+          .menu-row > div:nth-child(2) { padding-right: 0 !important; }
+          .menu-row > div:last-child { padding-top: 6px !important; }
+          .menu-row h3 { font-size: 18px !important; line-height: 1.2 !important; letter-spacing: -0.005em !important; }
+          .menu-row p { font-size: 12.5px !important; line-height: 1.55 !important; margin-top: 4px !important; }
+          .menu-row > div:last-child .serif { font-size: 15px !important; }
+          .menu-row > div:last-child > span:last-child { display: none !important; }
+          .menu-row > div:nth-child(2) > div:first-child > span:last-child { font-size: 9px !important; padding: 2px 6px !important; letter-spacing: 0.14em !important; }
         }
       `}</style>
     </article>

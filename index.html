@@ -186,8 +186,12 @@
     .zoom > img { transition: none !important; }
   }
 
+  /* Hard guard against horizontal overflow from decorative absolute elements */
+  html, body { overflow-x: clip; }
+
   @media (max-width: 720px) {
     body { font-size: 15px; line-height: 1.6; }
+    .wrap { padding: 0 20px !important; }
     .eyebrow { font-size: 10px; letter-spacing: 0.18em; }
 
     /* Section padding — global cap for any vertical >100px paddings */
